@@ -2,112 +2,67 @@ name: Upstream Sync Subscriptions
 
 on:
   schedule:
-    # 每天北京时间早晨 5:00 运行
-    # GitHub Actions 使用 UTC 时间，北京时间是 UTC+8
-    # 5:00 CST = 21:00 UTC (前一天)
+    # 每天北京时间早晨 5:00 运行 (UTC 21:00)
     - cron: '0 21 * * *'
-  workflow_dispatch: # 允许手动触发以便测试
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  # 任务 1: 同步 aoguai
-  sync_aoguai:
-    name: Sync aoguai_gkd.json5
+  # 使用 max-parallel: 1 确保三个任务按顺序执行，避免自我冲突
+  sync_all:
+    name: Sync Subscriptions
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1 # 关键：一次只运行一个任务，防止并行冲突
+      matrix:
+        include:
+          - file_name: aoguai_gkd.json5
+            url: https://raw.githubusercontent.com/aoguai/subscription/refs/heads/custom/dist/aoguai_gkd.json5
+            commit_msg: "auto-update: aoguai_gkd.json5"
+          - file_name: ganlin_gkd.json5
+            url: https://raw.githubusercontent.com/ganlinte/GKD-subscription/refs/heads/main/dist/ganlin_gkd.json5
+            commit_msg: "auto-update: ganlin_gkd.json5"
+          - file_name: MengNianxiaoyao_gkd.json5
+            url: https://raw.githubusercontent.com/MengNianxiaoyao/gkd-subscription/refs/heads/main/dist/gkd.json5
+            commit_msg: "auto-update: MengNianxiaoyao_gkd.json5"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # 获取完整历史以便 rebase
 
-      - name: Download and update aoguai_gkd.json5
+      - name: Download and Update ${{ matrix.file_name }}
         run: |
-          echo "[info] 下载 aoguai 订阅数据..."
-          curl -L -o aoguai_gkd.json5 "https://raw.githubusercontent.com/aoguai/subscription/refs/heads/custom/dist/aoguai_gkd.json5"
+          echo "[info] 处理文件：${{ matrix.file_name }}"
           
+          # 1. 下载文件
+          curl -L -o "${{ matrix.file_name }}" "${{ matrix.url }}"
+          
+          # 2. 配置 Git 用户
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          git add aoguai_gkd.json5
+          # 3. 添加文件
+          git add "${{ matrix.file_name }}"
+          
+          # 4. 检查是否有变化
           if ! git diff --staged --quiet; then
-            git commit -m "auto-update: aoguai_gkd.json5"
-            echo "[success] 检测到更新，准备推送。"
+            # 如果有变化，先提交
+            git commit -m "${{ matrix.commit_msg }}"
+            
+            echo "[info] 已提交更改，正在拉取远程最新代码以避免冲突..."
+            
+            # 5. 关键步骤：拉取并变基 (Rebase)
+            # 如果远程有更新，这会将我们的 commit 移到远程最新 commit 之上
+            git pull --rebase origin main
+            
+            echo "[info] 推送更改..."
+            # 6. 推送
+            git push origin main
           else
-            echo "[info] 没有检测到变更。"
+            echo "[info] 文件无变化，跳过提交和推送。"
           fi
-
-      - name: Push changes
-        if: success()
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref_name }}
-
-  # 任务 2: 同步 ganlinte
-  sync_ganlin:
-    name: Sync ganlin_gkd.json5
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download and update ganlin_gkd.json5
-        run: |
-          echo "[info] 下载 ganlinte 订阅数据..."
-          # 注意：您提供的链接是 json5，文件名也要求是 json5
-          curl -L -o ganlin_gkd.json5 "https://raw.githubusercontent.com/ganlinte/GKD-subscription/refs/heads/main/dist/ganlin_gkd.json5"
-          
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          
-          git add ganlin_gkd.json5
-          if ! git diff --staged --quiet; then
-            git commit -m "auto-update: ganlin_gkd.json5"
-            echo "[success] 检测到更新，准备推送。"
-          else
-            echo "[info] 没有检测到变更。"
-          fi
-
-      - name: Push changes
-        if: success()
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref_name }}
-
-  # 任务 3: 同步 MengNianxiaoyao
-  sync_mengnian:
-    name: Sync MengNianxiaoyao_gkd.json5
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download and update MengNianxiaoyao_gkd.json5
-        run: |
-          echo "[info] 下载 MengNianxiaoyao 订阅数据..."
-          curl -L -o MengNianxiaoyao_gkd.json5 "https://raw.githubusercontent.com/MengNianxiaoyao/gkd-subscription/refs/heads/main/dist/gkd.json5"
-          
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          
-          git add MengNianxiaoyao_gkd.json5
-          if ! git diff --staged --quiet; then
-            git commit -m "auto-update: MengNianxiaoyao_gkd.json5"
-            echo "[success] 检测到更新，准备推送。"
-          else
-            echo "[info] 没有检测到变更。"
-          fi
-
-      - name: Push changes
-        if: success()
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref_name }}
