@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  # 使用 max-parallel: 1 确保三个任务按顺序执行，避免自我冲突
+  # 使用 max-parallel: 1 确保所有任务按顺序执行，避免自我冲突
   sync_all:
     name: Sync Subscriptions
     runs-on: ubuntu-latest
@@ -27,6 +27,9 @@ jobs:
           - file_name: MengNianxiaoyao_gkd.json5
             url: https://raw.githubusercontent.com/MengNianxiaoyao/gkd-subscription/refs/heads/main/dist/gkd.json5
             commit_msg: "auto-update: MengNianxiaoyao_gkd.json5"
+          - file_name: mrlctate_gkd.json5
+            url: https://raw.githubusercontent.com/mrlctate/gkd-mrlc/refs/heads/main/dist/gkd.json5
+            commit_msg: "auto-update: mrlctate_gkd.json5"
 
     steps:
       - name: Checkout repository
