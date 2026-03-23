@@ -18,6 +18,7 @@
 | `aoguai_gkd.json5` | [aoguai/subscription](https://github.com/aoguai/subscription) | `custom/dist/aoguai_gkd.json5` | 傲乖订阅，规则丰富 |
 | `ganlin_gkd.json5` | [ganlinte/GKD-subscription](https://github.com/ganlinte/GKD-subscription) | `main/dist/ganlin_gkd.json5` | 甘林订阅，更新频繁 |
 | `MengNianxiaoyao_gkd.json5` | [MengNianxiaoyao/gkd-subscription](https://github.com/MengNianxiaoyao/gkd-subscription) | `main/dist/gkd.json5` | 梦年逍遥订阅 |
+| `mrlctate_gkd.json5` | [mrlctate/gkd-mrlc](https://github.com/mrlctate/gkd-mrlc) | `main/dist/gkd.json5` | mrlctate 订阅 |
 
 ## ⚠️ 免责声明
 本仓库仅作为规则搬运与聚合，所有订阅规则的版权和解释权归原作者所有。
