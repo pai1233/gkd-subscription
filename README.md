@@ -18,12 +18,14 @@
 | `aoguai_gkd.json5` | [aoguai/subscription](https://github.com/aoguai/subscription) | `custom/dist/aoguai_gkd.json5` | 傲乖订阅，规则丰富 |
 | `ganlin_gkd.json5` | [ganlinte/GKD-subscription](https://github.com/ganlinte/GKD-subscription) | `main/dist/ganlin_gkd.json5` | 甘林订阅，更新频繁 |
 | `MengNianxiaoyao_gkd.json5` | [MengNianxiaoyao/gkd-subscription](https://github.com/MengNianxiaoyao/gkd-subscription) | `main/dist/gkd.json5` | 梦年逍遥订阅 |
-⚠️ 免责声明
+
+## ⚠️ 免责声明
 本仓库仅作为规则搬运与聚合，所有订阅规则的版权和解释权归原作者所有。
 本仓库不生产任何规则，不对规则的准确性、安全性或兼容性负责。
 如果上游作者停止维护或要求删除，本仓库可能会同步移除相关规则。
 使用 GKD 及本订阅源请遵守当地法律法规，仅供个人学习交流使用。
-🙏 致谢
+
+## 🙏 致谢
 感谢以下开源项目作者提供的优质规则：
 @aoguai
 @ganlinte
